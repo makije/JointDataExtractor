@@ -8,9 +8,12 @@ public class JointDataExtractor {
 
 	public static void main(String[] args) {
 		
+		String outputFile = args[0];
+		String dataFile = args[1];
+		
 		ArrayList<String> jointTypes = new ArrayList<String>();
 		
-		File output = new File("./data.txt");
+		File output = new File(outputFile);
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(output);
@@ -18,7 +21,7 @@ public class JointDataExtractor {
 			e.printStackTrace();
 		}
 		
-		JointParser jp = new JointParser("/home/martin/workspace/JointDataExtractor/src/Funny_Anna_SkeletonData.xml");
+		JointParser jp = new JointParser(dataFile);
 		
 		for (Joint j : jp.getHandler().getFrames().get(0).getJoints()) {
 			if(!jointTypes.contains(j.getType()))
