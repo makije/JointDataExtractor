@@ -8,8 +8,9 @@ public class JointDataExtractor {
 
 	public static void main(String[] args) {
 		
-		String outputFile = args[0];
-		String dataFile = args[1];
+		String function = args[0];
+		String outputFile = args[1];
+		String dataFile = args[2];
 		
 		ArrayList<String> jointTypes = new ArrayList<String>();
 		
@@ -28,22 +29,62 @@ public class JointDataExtractor {
 				jointTypes.add(j.getType());
 		}
 		
-		for (String s : jointTypes) {
-			try {
-				fw.append(s + "\n");
-				
-				for (Frame f : jp.getHandler().getFrames()) {
-					fw.append(f.getNumber() + "\t");
-					for (Joint j : f.getJoints()) {
-						if(j.getType().equals(s))
-							fw.append(j.getX() + "\t" + j.getY() + "\t" + j.getZ() + "\n");
+		if(function.equalsIgnoreCase("extraction"))
+		{
+		
+			for (String s : jointTypes) {
+				try {
+					fw.append(s + "\n");
+					
+					for (Frame f : jp.getHandler().getFrames()) {
+						fw.append(f.getNumber() + "\t");
+						for (Joint j : f.getJoints()) {
+							if(j.getType().equals(s))
+								fw.append(j.getX() + "\t" + j.getY() + "\t" + j.getZ() + "\n");
+						}
+						fw.flush();
 					}
-					fw.flush();
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		
+		} else if(function.equalsIgnoreCase("vector"))
+		{
+			Frame previous = null;
+			for (Frame f : jp.getHandler().getFrames()) {
+				
+				if(previous == null)
+				{
+					for(int i = 0; i < f.getJoints().size(); i++)
+						try {
+							fw.append("0.0\t");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				} else {
+					for(int i = 0; i < f.getJoints().size(); i++)
+					{
+						try {
+							fw.append("" + Math.sqrt(Math.pow(f.getJoints().get(i).getX() - previous.getJoints().get(i).getX(), 2)
+									+ Math.pow(f.getJoints().get(i).getY() - previous.getJoints().get(i).getY(), 2)
+									+ Math.pow(f.getJoints().get(i).getZ() - previous.getJoints().get(i).getZ(), 2)) + "\t");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 				
-			} catch (IOException e) {
-				e.printStackTrace();
+				try {
+					fw.append("\n");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				previous = f;
 			}
+			
 		}
 	}
 	
